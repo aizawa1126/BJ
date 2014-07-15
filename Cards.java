@@ -1,8 +1,8 @@
-package original.ver1;
+package original.ver2;
 
 /**
  * Cardsクラス
- * @author r3pc
+ * @author nakamura
  * カードゲーム用のカードを表す。
  */
 public class Cards {
@@ -41,7 +41,7 @@ public class Cards {
      * getRestOfCardsメソッド
      * @return restOfCards カードの残り枚数
      */
-    protected int getRestOfCards() {
+    int getRestOfCards() {
 
         return restOfCards;
 
@@ -52,7 +52,7 @@ public class Cards {
      * トランプのセットからランダムに1枚カードを選ぶ。
      * @return randCard ランダムに選ばれたカード1枚
      */
-    protected int getRandCard() {
+    int getRandCard() {
 
         int randNum = (int) Math.floor(Math.random() * restOfCards);
         int randCard = deckArray[randNum];
@@ -68,7 +68,7 @@ public class Cards {
      * @param cardNum カード番号
      * @return カードの数字
      */
-    protected int getRank(int cardNum) {
+    int getRank(int cardNum) {
 
         return (cardNum - 1) % RANK + 1;
 
@@ -80,7 +80,7 @@ public class Cards {
      * @param cardNum カード番号
      * @return suitStr スート
      */
-    protected String getSuit(int cardNum) {
+    String getSuit(int cardNum) {
 
         String suitStr = "";
 

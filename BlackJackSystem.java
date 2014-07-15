@@ -1,10 +1,10 @@
-package original.ver1;
+package original.ver2;
 
 import lib.Input;
 
 /**
  * BlackJackSystemクラス
- * @author r3pc
+ * @author nakamura
  * ブラックジャックをするためのクラス。
  */
 public class BlackJackSystem {
@@ -22,6 +22,8 @@ public class BlackJackSystem {
     private static Cards cards = new Cards();
     private static Player player;
     private static Player dealer;
+
+    private static int result = 0;
 
     /**
      * @param args コマンドライン引数
@@ -59,12 +61,12 @@ public class BlackJackSystem {
      */
     private static int getTotalPoint(Player someone) {
 
-        int numOfHands = someone.getNumOfHands();
-        int[] rankArray = someone.getRankArray(cards, numOfHands);
         int totalPoint = 0;
+        int numOfHands = someone.getNumOfHands();
+        int[] handsOfSomeone = someone.getHandsArray();
 
         for (int i = 0; i < numOfHands; i++) {
-            totalPoint += toPoint(rankArray[i]);
+            totalPoint += toPoint(cards.getRank(handsOfSomeone[i]));
         }
 
         return totalPoint;
@@ -84,28 +86,12 @@ public class BlackJackSystem {
 
     }
 
-    /**
-     * dispHandsメソッド
-     * 手札を表示する。
-     */
-    private static void dispHands() {
-
-        String playerStr = "■Player\t(" + Integer.toString(getTotalPoint(player)) + "P)\t";
-        String dealerStr = "□Computer\t(--P)\t";
-
-        System.out.print("\n" + playerStr);
-        player.showHands(cards, NUMBER_OF_HANDS);
-        System.out.print(dealerStr);
-        dealer.showHands(cards, 1);
-        System.out.println();
-
-    }
 
     /**
      * animationメソッド
      * 約0.1秒に1つ☆☆を表示する。
      */
-    public static void animation() {
+    private static void animation() {
 
         System.out.println();
         int numOfTimes = ANIMATION_SPEED / 10;
@@ -138,9 +124,10 @@ public class BlackJackSystem {
      * 合計ポイントを比較し、勝敗を返す。
      * @return result 勝敗の結果
      */
-    private static int judge(int playerTotalPoint, int dealerTotalPoint) {
+    private static int judge() {
 
-        int result = 0;
+        int playerTotalPoint = getTotalPoint(player);
+        int dealerTotalPoint = getTotalPoint(dealer);
 
         if ((dealerTotalPoint > BLACKJACK && playerTotalPoint > BLACKJACK)
                 || dealerTotalPoint == playerTotalPoint) {
@@ -156,40 +143,6 @@ public class BlackJackSystem {
 
     }
 
-    /**
-     * dispResultメソッド
-     * 勝敗結果を受け取って表示する。
-     * @param result 勝敗結果
-     */
-    private static void dispResult(int result) {
-
-        String resultStr = "";
-
-        switch (result) {
-        case PLAYER_WIN:
-            resultStr = "あなたの勝ち";
-            break;
-        case DEALER_WIN:
-            resultStr = "コンピュータの勝ち";
-            break;
-        case DRAW:
-            resultStr = "引き分け";
-            break;
-        default:
-            resultStr = "";
-        }
-
-        String playerStr = "■Player\t(" + Integer.toString(getTotalPoint(player)) + "P)\t";
-        String dealerStr = "□Computer\t(" + Integer.toString(getTotalPoint(dealer)) + "P)\t";
-
-        System.out.print("\n" + playerStr);
-        player.showHands(cards, NUMBER_OF_HANDS);
-        System.out.print(dealerStr);
-        dealer.showHands(cards, NUMBER_OF_HANDS);
-
-        System.out.println("\n" + resultStr + "\n");
-
-    }
 
     /**
      * hitメソッド
@@ -207,7 +160,7 @@ public class BlackJackSystem {
             }
             player.pickCards(cards, 1);
             System.out.println();
-            dispHands();
+            show();
         }
 
     }
@@ -248,25 +201,93 @@ public class BlackJackSystem {
      * tryBlackjackメソッド
      * ブラックジャックをひと勝負行う。
      */
-    public static void tryBlackJack() {
-    	
-    	player = new Player(NUMBER_OF_HANDS);
+    private static void tryBlackJack() {
+
+        player = new Player(NUMBER_OF_HANDS);
         dealer = new Player(NUMBER_OF_HANDS);
-    	
-    	if (cards.getRestOfCards() <= NUMBER_OF_HANDS * 2) {
+        result = 0;
+
+        if (cards.getRestOfCards() <= NUMBER_OF_HANDS * 2) {
             cards = new Cards();
         }
 
         player.pickCards(cards, 2);
         dealer.pickCards(cards, 2);
 
-        dispHands();
+        show();
         hit();
         deal();
 
         animation();
-        dispResult(judge(getTotalPoint(player), getTotalPoint(dealer)));
-    	
+        result = judge();
+        show();
+
+    }
+
+    /**
+     * dispPayerAndDealerHandsメソッド
+     * プレーヤーとディーラーの手を表示する。
+     * @param result 勝敗結果
+     */
+    private static void dispPlayerAndDealerHands() {
+
+        String playerStr = "■Player\t(" + Integer.toString(getTotalPoint(player)) + "P)\t";
+        String dealerStr = "";
+
+        if (result == 0) {
+
+            dealerStr = "□Computer\t(--P)\t";
+
+            System.out.print("\n" + playerStr);
+            player.showHands(cards, NUMBER_OF_HANDS);
+            System.out.print(dealerStr);
+            dealer.showHands(cards, 1);
+            System.out.print("\n");
+
+        } else {
+
+            dealerStr = "□Computer\t(" + Integer.toString(getTotalPoint(dealer)) + "P)\t";
+
+            System.out.print("\n" + playerStr);
+            player.showHands(cards, NUMBER_OF_HANDS);
+            System.out.print(dealerStr);
+            dealer.showHands(cards, NUMBER_OF_HANDS);
+
+        }
+
+    }
+
+    /**
+     * showメソッド
+     * ゲームの状況を表示する。
+     * @param result 勝敗結果
+     */
+    private static void show() {
+
+        dispPlayerAndDealerHands();
+
+        if (result != 0) {
+
+            String resultStr = "";
+
+            switch (result) {
+            case PLAYER_WIN:
+                resultStr = "あなたの勝ち";
+                break;
+            case DEALER_WIN:
+                resultStr = "コンピュータの勝ち";
+                break;
+            case DRAW:
+                resultStr = "引き分け";
+                break;
+            default:
+                resultStr = "";
+            }
+
+            System.out.println("\n" + resultStr + "\n");
+
+        }
+
     }
 
 }

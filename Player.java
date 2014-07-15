@@ -1,8 +1,8 @@
-package original.ver1;
+package original.ver2;
 
 /**
  * Playerクラス
- * @author r3pc
+ * @author nakamura
  * カードゲームのプレイヤーを表す。
  */
 public class Player {
@@ -12,29 +12,41 @@ public class Player {
 
     /**
      * コンストラクタ
-     * @param num 持てる手札の枚数
+     * @param maxNumOfHands 持てる手札の枚数
      */
-    public Player(int num) {
+    public Player(int maxNumOfHands) {
 
-        numOfHands = 0;
-        handsArray = new int[num];
+        this.numOfHands = 0;
+        this.handsArray = new int[maxNumOfHands];
+
+    }
+
+    /**
+     * getNumOfHandsメソッド
+     * 有効な手札の枚数を取得する。
+     * @return numOfHands 有効な手札の枚数
+     */
+    int getNumOfHands() {
+
+        return numOfHands;
 
     }
 
     /**
      * getHandsArrayメソッド
-     * 手札配列を取得する。
-     * @return handsArray 手札配列
+     * 手札配列のコピーを取得する。
+     * @return handsCopyArray 手札配列のコピー
      */
-    protected int[] getHandsArray() {
+    int[] getHandsArray() {
 
-        return handsArray;
+        int arrayLength = handsArray.length;
+        int[] handsCopyArray = new int[arrayLength];
 
-    }
+        for (int i = 0; i < arrayLength; i++) {
+            handsCopyArray[i] = handsArray[i];
+        }
 
-    protected int getNumOfHands() {
-
-        return numOfHands;
+        return handsCopyArray;
 
     }
 
@@ -44,7 +56,7 @@ public class Player {
      * @param cards トランプのセット
      * @param numOfCards カードの枚数
      */
-    protected void pickCards(Cards cards, int numOfCards) {
+    void pickCards(Cards cards, int numOfCards) {
 
         if (handsArray.length < numOfCards) {
             return;
@@ -69,7 +81,7 @@ public class Player {
      * @param position 捨てるカードの位置
      * @return selectCard 選んだカード
      */
-    protected int pullOutHands(int position) {
+    int pullOutHands(int position) {
 
         if (position > handsArray.length) {
             position = handsArray.length;
@@ -86,66 +98,21 @@ public class Player {
     }
 
     /**
-     * getRankArrayメソッド
-     * 指定された枚数分の手札の数字を返す。
-     * @param cards トランプのセット
-     * @param numOfCards カードの枚数
-     * @return rankArray 手札の数字の配列
-     */
-    protected int[] getRankArray(Cards cards, int numOfCards) {
-
-        if (numOfHands < numOfCards) {
-            numOfCards = numOfHands;
-        }
-
-        int[] rankArray = new int[numOfCards];
-
-        for (int i = 0; i < numOfCards; i++) {
-            rankArray[i] = cards.getRank(handsArray[i]);
-        }
-
-        return rankArray;
-
-    }
-
-    /**
-     * getSuitArrayメソッド
-     * 指定された枚数分の手札のスートを返す。
-     * @param cards トランプのセット
-     * @param numOfCards カードの枚数
-     * @return suitArray 手札のスートの配列
-     */
-    protected String[] getSuitArray(Cards cards, int numOfCards) {
-
-        if (numOfHands < numOfCards) {
-            numOfCards = numOfHands;
-        }
-
-        String[] suitArray = new String[numOfCards];
-
-        for (int i = 0; i < numOfCards; i++) {
-            suitArray[i] = cards.getSuit(handsArray[i]);
-        }
-
-        return suitArray;
-
-    }
-
-    /**
      * showHandsメソッド
      * 手札を指定枚数分だけ表示する。
      * @param cards
      */
-    protected void showHands(Cards cards, int numOfCards) {
+    void showHands(Cards cards, int numOfCards) {
 
-        String[] suitArray = getSuitArray(cards, numOfCards);
-        int[] rankArray = getRankArray(cards, numOfCards);
+        if (numOfCards > numOfHands) {
+            numOfCards = numOfHands;
+        }
 
-        numOfCards = rankArray.length;
         String dataStr = "";
 
         for (int i = 0; i < numOfCards; i++) {
-            dataStr += suitArray[i] + "<" + Integer.toString(rankArray[i]) + ">\t";
+            dataStr += cards.getSuit(handsArray[i]) + "<"
+                    + Integer.toString(cards.getRank(handsArray[i])) + ">\t";
         }
 
         if (numOfCards < numOfHands) {
@@ -157,6 +124,8 @@ public class Player {
         System.out.print(dataStr + "\n");
 
     }
+
+
 
 
 }
